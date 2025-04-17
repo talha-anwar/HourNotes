@@ -126,7 +126,7 @@ fun SimpleAppScreen() {
                         }
                     }
                 },
-                modifier = Modifier.height(80.dp),
+                modifier = Modifier.height(60.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     titleContentColor = MaterialTheme.colorScheme.onSecondary
@@ -153,9 +153,9 @@ fun PinterestGrid() {
     // Use the LazyVerticalStaggeredGrid from Jetpack Compose
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // You can adjust number of columns
-        contentPadding = PaddingValues(4.dp),
-        verticalItemSpacing = 4.dp,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(8.dp),
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(dummyPins) { pin ->
