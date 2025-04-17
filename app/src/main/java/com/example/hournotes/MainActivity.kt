@@ -5,50 +5,80 @@ package com.example.hournotes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.hournotes.R.drawable.prem
 import com.example.hournotes.ui.theme.HourNotesTheme
+import kotlin.random.Random
 
+// Sample data with image info
+data class PinItem(
+    val id: Int,
+    val title: String,
+    val color: Color,
+    val aspectRatio: Float // Will help simulate images of different heights
+)
 
-val dummyList = List(30) { "Item #$it" }
+// Create dummy pin items with varying heights
+val dummyPins = List(30) { index ->
+    val colorOptions = listOf(
+        Color(0xFFE57373), // Red
+        Color(0xFF81C784), // Green
+        Color(0xFF64B5F6), // Blue
+        Color(0xFFFFD54F), // Yellow
+        Color(0xFFBA68C8)  // Purple
+    )
+
+    // Random aspect ratio between 0.6 (portrait) and 1.5 (landscape)
+    val aspectRatio = (Random.nextFloat() * 0.9f) + 0.6f
+
+    PinItem(
+        id = index,
+        title = "Pin #$index",
+        color = colorOptions[index % colorOptions.size],
+        aspectRatio = aspectRatio
+    )
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             HourNotesTheme {
-                // Just displaying the button
                 SimpleAppScreen()
             }
         }
@@ -56,54 +86,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SmallExample(onClick: () -> Unit) {
-    SmallFloatingActionButton(
-        onClick = { onClick() },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.secondary
+fun AddButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
-        Icon(Icons.Filled.Add, "Small floating action button.")
-    }
-}
-
-@Composable
-fun StaggeredGridScreen() {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(dummyList) { item ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height((100..250).random().dp) // Simulate Pinterest-style varying heights
-            ) {
-                Box {
-                    Image(
-                        painter = painterResource(id = prem),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop // Makes it fill the card
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        contentAlignment = Alignment.BottomStart
-                    ) {
-                        Text(
-                            text = item,
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-            }
-        }
-
+        Icon(Icons.Filled.Add, "Add new pin")
     }
 }
 
@@ -115,11 +104,10 @@ fun SimpleAppScreen() {
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier
-                            .fillMaxHeight(), // Take full height of the TopAppBar
-                        contentAlignment = Alignment.CenterStart // Align text vertically center, horizontally left
+                        modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.CenterStart
                     ) {
-                        Text("HourNotes")
+                        Text("HourNotes", style = MaterialTheme.typography.titleLarge)
                     }
                 },
                 actions = {
@@ -128,17 +116,17 @@ fun SimpleAppScreen() {
                             .fillMaxHeight()
                             .padding(end = 16.dp),
                         contentAlignment = Alignment.Center
-                    ){
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .padding(end = 16.dp),
-                        )
+                    ) {
+                        IconButton(onClick = { /* Settings action */ }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
                     }
                 },
-                modifier = Modifier.height(80.dp), // Custom height
+                modifier = Modifier.height(80.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     titleContentColor = MaterialTheme.colorScheme.onSecondary
@@ -146,25 +134,82 @@ fun SimpleAppScreen() {
             )
         },
         floatingActionButton = {
-            SmallExample(onClick = { /* Handle button click here */ })
+            AddButton(onClick = { /* Handle button click here */ })
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-//            Image(
-//            painter = painterResource(id = R.drawable.prem),
-//            contentDescription = null,
-//            modifier = Modifier.fillMaxSize(),
-//            contentScale = ContentScale.Crop
-//            )
-            StaggeredGridScreen()
+            PinterestGrid()
         }
     }
 }
 
+@Composable
+fun PinterestGrid() {
+    // Use the LazyVerticalStaggeredGrid from Jetpack Compose
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(2), // You can adjust number of columns
+        contentPadding = PaddingValues(4.dp),
+        verticalItemSpacing = 4.dp,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(dummyPins) { pin ->
+            PinCard(pin)
+        }
+    }
+}
+
+@Composable
+fun PinCard(pin: PinItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = pin.color.copy(alpha = 0.8f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column {
+            // This box represents the image with the pin's aspect ratio
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(pin.aspectRatio) // Use our simulated aspect ratio
+                    .background(pin.color)
+                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                // In a real app, you would place an actual image here
+                Text(
+                    text = "Image ${pin.id}",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            // Pin title/caption
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = pin.title,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -173,5 +218,3 @@ fun SimpleAppScreenPreview() {
         SimpleAppScreen()
     }
 }
-
-
