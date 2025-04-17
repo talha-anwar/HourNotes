@@ -5,14 +5,22 @@ package com.example.hournotes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,13 +33,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.hournotes.R.drawable.prem
 import com.example.hournotes.ui.theme.HourNotesTheme
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
-import com.example.hournotes.R // make sure this is imported
+
+
+val dummyList = List(30) { "Item #$it" }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +63,47 @@ fun SmallExample(onClick: () -> Unit) {
         contentColor = MaterialTheme.colorScheme.secondary
     ) {
         Icon(Icons.Filled.Add, "Small floating action button.")
+    }
+}
+
+@Composable
+fun StaggeredGridScreen() {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp),
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(dummyList) { item ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((100..250).random().dp) // Simulate Pinterest-style varying heights
+            ) {
+                Box {
+                    Image(
+                        painter = painterResource(id = prem),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop // Makes it fill the card
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.BottomStart
+                    ) {
+                        Text(
+                            text = item,
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -103,7 +154,13 @@ fun SimpleAppScreen() {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            // Content here
+//            Image(
+//            painter = painterResource(id = R.drawable.prem),
+//            contentDescription = null,
+//            modifier = Modifier.fillMaxSize(),
+//            contentScale = ContentScale.Crop
+//            )
+            StaggeredGridScreen()
         }
     }
 }
