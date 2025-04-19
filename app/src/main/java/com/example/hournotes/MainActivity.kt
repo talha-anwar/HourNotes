@@ -5,6 +5,7 @@ package com.example.hournotes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,8 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hournotes.ui.theme.HourNotesTheme
@@ -49,28 +50,34 @@ import kotlin.random.Random
 data class PinItem(
     val id: Int,
     val title: String,
-    val color: Color,
-    val aspectRatio: Float // Will help simulate images of different heights
+    val imageResIdRes: Int,
+    val aspectRatio: Float, // Will help simulate images of different heights
+    val imageRe: Int
 )
-
+val imageIds = listOf(
+    R.drawable.cr,
+    R.drawable.nigga,
+    R.drawable.no_bitches,
+    R.drawable.oh_maa_gahh,
+    R.drawable.quandale_dingle,
+    R.drawable.prem,
+    R.drawable.massive_rat,
+    R.drawable.meat_bob,
+    R.drawable.sassy_bee,
+    R.drawable.sassy_car_2,
+    R.drawable.sassy_car,
+    R.drawable.wator_melon,
+    R.drawable.hehe
+)
 // Create dummy pin items with varying heights
 val dummyPins = List(30) { index ->
-    val colorOptions = listOf(
-        Color(0xFFE57373), // Red
-        Color(0xFF81C784), // Green
-        Color(0xFF64B5F6), // Blue
-        Color(0xFFFFD54F), // Yellow
-        Color(0xFFBA68C8)  // Purple
-    )
-
-    // Random aspect ratio between 0.6 (portrait) and 1.5 (landscape)
     val aspectRatio = (Random.nextFloat() * 0.9f) + 0.6f
-
     PinItem(
         id = index,
         title = "Pin #$index",
-        color = colorOptions[index % colorOptions.size],
-        aspectRatio = aspectRatio
+        imageResIdRes = imageIds[index % imageIds.size],
+        aspectRatio = aspectRatio,
+        imageRe = imageIds[index % imageIds.size]
     )
 }
 
@@ -169,31 +176,21 @@ fun PinCard(pin: PinItem) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = pin.color.copy(alpha = 0.8f)
-        ),
+        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(8.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column {
-            // This box represents the image with the pin's aspect ratio
-            Box(
+            Image(
+                painter = painterResource(id = pin.imageResIdRes),
+                contentDescription = "Pin Image",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(pin.aspectRatio) // Use our simulated aspect ratio
-                    .background(pin.color)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                // In a real app, you would place an actual image here
-                Text(
-                    text = "Image ${pin.id}",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+                    .aspectRatio(pin.aspectRatio) // height adjusts to match image
+                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+            )
 
-            // Pin title/caption
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,15 +198,15 @@ fun PinCard(pin: PinItem) {
             ) {
                 Text(
                     text = pin.title,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(8.dp),
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
